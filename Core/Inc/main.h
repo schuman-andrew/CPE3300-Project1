@@ -59,6 +59,10 @@ void Error_Handler(void);
 /* Private defines -----------------------------------------------------------*/
 #define B1_Pin GPIO_PIN_13
 #define B1_GPIO_Port GPIOC
+#define TX_PIN_Pin GPIO_PIN_2
+#define TX_PIN_GPIO_Port GPIOA
+#define RX_PIN_Pin GPIO_PIN_3
+#define RX_PIN_GPIO_Port GPIOA
 #define LD2_Pin GPIO_PIN_5
 #define LD2_GPIO_Port GPIOA
 #define TMS_Pin GPIO_PIN_13
@@ -69,7 +73,6 @@ void Error_Handler(void);
 #define SWO_GPIO_Port GPIOB
 
 /* USER CODE BEGIN Private defines */
-void resetBuffer(char * buffer);
 
 /* USER CODE END Private defines */
 

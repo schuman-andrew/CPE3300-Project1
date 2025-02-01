@@ -25,6 +25,7 @@
 /* USER CODE BEGIN Includes */
 #include <stdio.h>
 #include "string.h"
+#include "dataFunctions.h"
 
 /* USER CODE END Includes */
 
@@ -117,13 +118,22 @@ int main(void)
   while (1)
   {
 	  uint8_t data;
+	  HAL_StatusTypeDef rx;
 
-	  HAL_UART_Receive(&huart2, &data, 1, HAL_MAX_DELAY);
+	  //idle at 1
+	  HAL_GPIO_WritePin(GPIOA, TX_PIN_Pin, GPIO_PIN_SET);
+
+	 // HAL_UART_Receive_IT(huart, pData, Size)
+
+	  /*if(HAL_UART_GetState(&huart2) == HAL_UART_STATE_BUSY_RX){
+		 while(rx == HAL_BUSY){*/
+	  rx = HAL_UART_Receive(&huart2, &data, 1, HAL_MAX_DELAY);
 
 	  if(data == 13 || data == 10){
 		  for(int y=0; y<x; y++){
 			  printf("%c", rxString[y]);
 		  }
+		  sendData(rxString, x);
 		  resetBuffer(rxString);
 		  printf("\n");
 		  x=0;
@@ -139,8 +149,6 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-
-	  //printf("akjkj\n");
   }
   /* USER CODE END 3 */
 }
@@ -192,10 +200,8 @@ void SystemClock_Config(void)
 }
 
 /* USER CODE BEGIN 4 */
-void resetBuffer(char * buffer){
-	for(int x=0; x<256; x++){
-		buffer[x] = 0;
-	}
+void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart){
+	printf("hi\n");
 }
 
 /* USER CODE END 4 */
