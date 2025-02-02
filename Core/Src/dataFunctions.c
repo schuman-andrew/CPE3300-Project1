@@ -9,6 +9,7 @@
 #include "usart.h"
 #include "gpio.h"
 #include <stdio.h>
+#include "delay.h"
 
 uint8_t preamble = 0x55;
 uint8_t dataLength = 0;
@@ -40,32 +41,48 @@ void sendData(char * data, int length){
 
 	//send preamble
 	for(int x = 0; x < byteLenght; x++){
-		if(((preamble>>x) & 0x01) == 0b1){
+		if(((preamble<<x) & 0x80) == 0x80){
 			//printf("1");
-			HAL_UART_Transmit(&huart2, (uint8_t *)&one, 1, HAL_MAX_DELAY);
-		} else if(((preamble>>x) & 0b1) == 0b0){
+			//HAL_UART_Transmit(&huart2, (uint8_t *)&one, 1, HAL_MAX_DELAY);
+			HAL_GPIO_WritePin(GPIOA, GPIO_PIN_10, GPIO_PIN_RESET);
+		} else if(((preamble<<x) & 0x80) == 0x00){
 			//printf("0");
-			HAL_UART_Transmit(&huart2, (uint8_t *)&zero, 1, HAL_MAX_DELAY);
+			//HAL_UART_Transmit(&huart2, (uint8_t *)&zero, 1, HAL_MAX_DELAY);
+			HAL_GPIO_WritePin(GPIOA, GPIO_PIN_10, GPIO_PIN_SET);
 		}
+		delay_us(2650);
+		HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_10);
+		delay_us(2650);
 	}
 
 	//send length
 	for(int x = 0; x < byteLenght; x++){
-		if((dataLength>>x) & 0x01 == 0b1){
-			HAL_UART_Transmit(&huart2, (uint8_t *)&one, 1, HAL_MAX_DELAY);
-		} else if((dataLength>>x) & 0x01 == 0b1){
-			HAL_UART_Transmit(&huart2, (uint8_t *)&zero, 1, HAL_MAX_DELAY);
+		if(((dataLength<<x) & 0x80) == 0x80){
+			//HAL_UART_Transmit(&huart2, (uint8_t *)&one, 1, HAL_MAX_DELAY);
+			HAL_GPIO_WritePin(GPIOA, GPIO_PIN_10, GPIO_PIN_RESET);
+		} else if(((dataLength<<x) & 0x80) == 0x00){
+			//HAL_UART_Transmit(&huart2, (uint8_t *)&zero, 1, HAL_MAX_DELAY);
+			HAL_GPIO_WritePin(GPIOA, GPIO_PIN_10, GPIO_PIN_SET);
 		}
+		delay_us(2650);
+		HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_10);
+		delay_us(2650);
 	}
 
 	//send data
 	for(int x = 0; x < dataLength; x++){
 		for(int y = 0; y < byteLenght; y++){
-			if((data[x]>>y) & 0x01 == 0b1){
-				HAL_UART_Transmit(&huart2, (uint8_t *)&one, 1, HAL_MAX_DELAY);
-			} else if((data[x]>>y) & 0x01 == 0b1){
-				HAL_UART_Transmit(&huart2, (uint8_t *)&zero, 1, HAL_MAX_DELAY);
+			if(((data[x]<<y) & 0x80) == 0x80){
+				//HAL_UART_Transmit(&huart2, (uint8_t *)&one, 1, HAL_MAX_DELAY);
+				HAL_GPIO_WritePin(GPIOA, GPIO_PIN_10, GPIO_PIN_RESET);
+			} else if(((data[x]<<y) & 0x80) == 0x00){
+				//HAL_UART_Transmit(&huart2, (uint8_t *)&zero, 1, HAL_MAX_DELAY);
+				HAL_GPIO_WritePin(GPIOA, GPIO_PIN_10, GPIO_PIN_SET);
 			}
+			delay_us(2650);
+			HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_10);
+			delay_us(2650);
 		}
 	}
+	HAL_GPIO_WritePin(GPIOA, GPIO_PIN_10, GPIO_PIN_SET);
 }

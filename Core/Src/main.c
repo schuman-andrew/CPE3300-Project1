@@ -20,6 +20,7 @@
 #include "main.h"
 #include "usart.h"
 #include "gpio.h"
+#include "delay.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -122,7 +123,8 @@ int main(void)
 
 	  //idle at 1
 	  HAL_GPIO_WritePin(GPIOA, TX_PIN_Pin, GPIO_PIN_SET);
-
+	  HAL_GPIO_WritePin(GPIOA, GPIO_PIN_10, GPIO_PIN_SET);
+	  //HAL_Delay(100);
 	 // HAL_UART_Receive_IT(huart, pData, Size)
 
 	  /*if(HAL_UART_GetState(&huart2) == HAL_UART_STATE_BUSY_RX){
