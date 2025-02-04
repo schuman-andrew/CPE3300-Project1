@@ -8,9 +8,9 @@
 #ifndef DELAY_H_
 #define DELAY_H_
 
-#define CYCLE_PER_MS 1900
+#define CYCLE_PER_MS 7940
 
-#define CYCLE_PER_US 2
+#define CYCLE_PER_US 5.22
 #define SYSTICK_BASE 0xE000E010
 #define CTRL 0
 #define LOAD 1

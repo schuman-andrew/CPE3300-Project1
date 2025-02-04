@@ -50,9 +50,9 @@ void sendData(char * data, int length){
 			//HAL_UART_Transmit(&huart2, (uint8_t *)&zero, 1, HAL_MAX_DELAY);
 			HAL_GPIO_WritePin(GPIOA, GPIO_PIN_10, GPIO_PIN_SET);
 		}
-		delay_us(2650);
+		delay_us(500);
 		HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_10);
-		delay_us(2650);
+		delay_us(500);
 	}
 
 	//send length
@@ -64,9 +64,9 @@ void sendData(char * data, int length){
 			//HAL_UART_Transmit(&huart2, (uint8_t *)&zero, 1, HAL_MAX_DELAY);
 			HAL_GPIO_WritePin(GPIOA, GPIO_PIN_10, GPIO_PIN_SET);
 		}
-		delay_us(2650);
+		delay_us(500);
 		HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_10);
-		delay_us(2650);
+		delay_us(500);
 	}
 
 	//send data
@@ -79,9 +79,9 @@ void sendData(char * data, int length){
 				//HAL_UART_Transmit(&huart2, (uint8_t *)&zero, 1, HAL_MAX_DELAY);
 				HAL_GPIO_WritePin(GPIOA, GPIO_PIN_10, GPIO_PIN_SET);
 			}
-			delay_us(2650);
+			delay_us(500);
 			HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_10);
-			delay_us(2650);
+			delay_us(500);
 		}
 	}
 	HAL_GPIO_WritePin(GPIOA, GPIO_PIN_10, GPIO_PIN_SET);
