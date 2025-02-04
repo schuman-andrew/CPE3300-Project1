@@ -20,13 +20,13 @@
 #include "main.h"
 #include "usart.h"
 #include "gpio.h"
-#include "delay.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include <stdio.h>
 #include "string.h"
 #include "dataFunctions.h"
+#include <stdbool.h>
 
 /* USER CODE END Includes */
 
@@ -50,6 +50,7 @@
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
+int edgeTrigger;
 
 /* USER CODE END PV */
 
@@ -115,17 +116,23 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   char rxString[255];
   int x = 0;
+  edgeTrigger = 0;
 
   while (1)
   {
 	  uint8_t data;
 	  HAL_StatusTypeDef rx;
 
+	  //set tx and rx to GPIO in/out
+	  //rx interrupt for clock edge - starts timer, calls function
+	  //if statement for rx, if statement for tx
+
 	  //idle at 1
-	  HAL_GPIO_WritePin(GPIOA, TX_PIN_Pin, GPIO_PIN_SET);
+	  //HAL_GPIO_WritePin(GPIOA, TX_PIN_Pin, GPIO_PIN_SET);
 	  HAL_GPIO_WritePin(GPIOA, GPIO_PIN_10, GPIO_PIN_SET);
 	  //HAL_Delay(100);
 	 // HAL_UART_Receive_IT(huart, pData, Size)
+
 
 	  /*if(HAL_UART_GetState(&huart2) == HAL_UART_STATE_BUSY_RX){
 		 while(rx == HAL_BUSY){*/
@@ -202,8 +209,27 @@ void SystemClock_Config(void)
 }
 
 /* USER CODE BEGIN 4 */
-void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart){
-	printf("hi\n");
+
+void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
+{
+  /* Prevent unused argument(s) compilation warning */
+  UNUSED(GPIO_Pin);
+  //reset/set timer, check if it is >480us
+
+
+  //skip next edge
+  if(1){
+	  edgeTrigger++;
+  } else {
+	  edgeTrigger = 0;
+  }
+
+  //GPIO_PIN_RESET
+  //GPIO_PIN_SET
+  rxPin = (int)HAL_GPIO_ReadPin(RX_PIN_GPIO_Port, GPIO_Pin);
+  rxRead(rxPin);
+
+
 }
 
 /* USER CODE END 4 */

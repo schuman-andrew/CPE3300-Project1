@@ -11,12 +11,21 @@
 #include <stdio.h>
 #include "delay.h"
 
+//tx
 uint8_t preamble = 0x55;
 uint8_t dataLength = 0;
 int byteLenght = 8;
 
 uint8_t zero = 0xf0;
 uint8_t one = 0x0f;
+
+//rx
+uint8_t preambleIn;
+bool preamRx;
+uint8_t dataLengthIn;
+bool lengthIn;
+uint8_t dataIn[255];
+int rxPin;
 
 /* resetBuffer
  *
@@ -85,4 +94,23 @@ void sendData(char * data, int length){
 		}
 	}
 	HAL_GPIO_WritePin(GPIOA, GPIO_PIN_10, GPIO_PIN_SET);
+}
+
+
+void rxRead(GPIO_PinState state){
+	if(edgeTrigger == 0){
+	  rxPin = (int)HAL_GPIO_ReadPin(RX_PIN_GPIO_Port, GPIO_Pin);
+	  if(preamRx == false){
+		  //check preamble
+
+	  } else if(lengthRx == false){
+		  //get length
+
+	  } else {
+		  //get data bytes
+
+	  }
+}
+
+
 }

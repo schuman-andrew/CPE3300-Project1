@@ -12,4 +12,6 @@ void resetBuffer(char * buffer);
 
 void sendData(char * data, int length);
 
+void rxRead(GPIO_PinState state);
+
 #endif /* INC_DATAFUNCTIONS_H_ */
