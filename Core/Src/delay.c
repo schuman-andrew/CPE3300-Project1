@@ -25,7 +25,7 @@ void delay_ms(int delay)
 	// Set the timer value to 0
 	systick_base[VAL] = 0;
 	// Enable the timer to start counting
-	systick_base[CTRL] |= ENABLE;
+	systick_base[CTRL] |= EN;
 
 	// Waits until the count flag goes high
 	// which means the timer has reached 0
@@ -34,7 +34,7 @@ void delay_ms(int delay)
 		// busy loop
 	}
 	// Disable the timer
-	systick_base[CTRL] &= !ENABLE;
+	systick_base[CTRL] &= !EN;
 }
 
 /*
@@ -49,7 +49,7 @@ void delay_us(int delay)
 	// Set the timer value to 0
 	systick_base[VAL] = 0;
 	// Enable the timer to start counting
-	systick_base[CTRL] |= ENABLE;
+	systick_base[CTRL] |= EN;
 
 	// Waits until the count flag goes high
 	// which means the timer has reached 0
@@ -58,5 +58,5 @@ void delay_us(int delay)
 		// busy loop
 	}
 	// Disable the timer
-	systick_base[CTRL] &= !ENABLE;
+	systick_base[CTRL] &= !EN;
 }

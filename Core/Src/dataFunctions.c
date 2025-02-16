@@ -10,6 +10,12 @@
 #include "gpio.h"
 #include <stdio.h>
 #include "delay.h"
+#include "stdbool.h"
+#include "timer.h"
+#include "stm32f411xe.h"
+#include "usart.h"
+
+//static volatile EXTI_TypeDef* const exti = (EXTI_TypeDef*) EXTI_BASE;
 
 //tx
 uint8_t preamble = 0x55;
@@ -23,10 +29,14 @@ uint8_t one = 0x0f;
 uint8_t preambleIn;
 bool preamRx;
 uint8_t dataLengthIn;
-bool lengthIn;
+bool lengthRx;
 uint8_t dataIn[255];
-int rxPin;
+uint8_t dataRead[255];
+static int cnt = 0;
 
+static int rxPin;
+extern int timerInt;
+//static int edgeTrigger;
 /* resetBuffer
  *
  */
@@ -97,20 +107,80 @@ void sendData(char * data, int length){
 }
 
 
-void rxRead(GPIO_PinState state){
-	if(edgeTrigger == 0){
-	  rxPin = (int)HAL_GPIO_ReadPin(RX_PIN_GPIO_Port, GPIO_Pin);
-	  if(preamRx == false){
-		  //check preamble
+void rxRead(){
 
-	  } else if(lengthRx == false){
-		  //get length
+	  rxPin = (int)HAL_GPIO_ReadPin(RX_PIN_GPIO_Port, RX_PIN_Pin);
+//	  printf("%d",rxPin);
+	  resetTimer();
+	  timerInt = 0;
+	  cnt++;
+//	  if(cnt == 50){
+//		  disableTimer();
+//		  exti->IMR = 0;
+//	  }
+//	  printf(" %d ", getTime());
 
-	  } else {
-		  //get data bytes
+	  // reset timer
+//	  resetTimer();
+	  // save data
+	  dataRead[cnt] = (uint8_t) rxPin;
+	  dataRead[cnt+1] = 2;
+//	  printf("%d", (int) dataRead[cnt]);
 
-	  }
 }
 
+void processData(void)
+{
 
+	int index = 0;
+	uint16_t preamble = 0;
+	uint16_t length = 0;
+	uint32_t data = 0;
+
+//	printf(" %d ", (int) dataRead[cnt]);
+//	printf( "%d ", (int) dataRead[index]);
+	//check preamble
+	while((dataRead[index] != 2) && (index < 9))
+	{
+		if(dataRead[index] == 1)
+		{
+			preamble |= 0b1;
+		}
+		preamble = preamble<<1;
+		index++;
+	}
+	preamble = preamble>>1;
+
+	if(preamble == 0x55)
+	{
+		while((dataRead[index] != 2) && (index > 8) && (index < 17))
+		{
+			if(dataRead[index] == 1)
+			{
+				length |= 0b1;
+			}
+			length = length<<1;
+			index++;
+		}
+		length = length>>1;
+
+		while((dataRead[index] != 2) && (index != 255))
+		{
+			for(int i=0; (i<8) && (dataRead[index] != 2); i++)
+			{
+				if(dataRead[index] == 1)
+				{
+					data |= 0b1;
+				}
+				data = data<<1;
+				index++;
+			}
+			data = data>>1;
+			printf("%c", (char)data);
+			data = 0;
+		}
+	}
+	// check if length correct
+
+	cnt = 0;
 }

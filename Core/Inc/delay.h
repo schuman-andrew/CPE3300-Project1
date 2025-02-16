@@ -10,12 +10,12 @@
 
 #define CYCLE_PER_MS 7940
 
-#define CYCLE_PER_US 5.22
+#define CYCLE_PER_US 10.44
 #define SYSTICK_BASE 0xE000E010
 #define CTRL 0
 #define LOAD 1
 #define VAL 2
-#define ENABLE 1<<0
+#define EN 1<<0
 #define CLOCKSRC 1<<2
 #define COUNTFLAG 1<<16
 

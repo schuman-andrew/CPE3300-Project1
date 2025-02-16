@@ -2,3 +2,10 @@
 *.su
 *.cyclo
 *.d
+*makefile
+*.map
+*.list
+*.mk
+*.elf
+.settings/stm32cubeide.project.prefs
+.settings/language.settings.xml

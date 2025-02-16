@@ -8,10 +8,14 @@
 #ifndef INC_DATAFUNCTIONS_H_
 #define INC_DATAFUNCTIONS_H_
 
+#include "gpio.h"
+
 void resetBuffer(char * buffer);
 
 void sendData(char * data, int length);
 
-void rxRead(GPIO_PinState state);
+void rxRead(void);
+
+void processData(void);
 
 #endif /* INC_DATAFUNCTIONS_H_ */
