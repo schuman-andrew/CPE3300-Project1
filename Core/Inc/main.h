@@ -31,6 +31,8 @@ extern "C" {
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
+#define PUTCHAR_PROTOTYPE int __io_putchar(int ch)
+#define GETCHAR_PROTOTYPE int __io_getchar(void)
 
 /* USER CODE END Includes */
 

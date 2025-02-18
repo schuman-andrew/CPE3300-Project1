@@ -13,17 +13,18 @@
 #include "stdbool.h"
 #include "timer.h"
 #include "stm32f411xe.h"
-#include "usart.h"
 
 //static volatile EXTI_TypeDef* const exti = (EXTI_TypeDef*) EXTI_BASE;
+
+char dataReceived[255];
+bool receiveFlag = true;
+int printLength;
+int num = 0;
 
 //tx
 uint8_t preamble = 0x55;
 uint8_t dataLength = 0;
 int byteLenght = 8;
-
-uint8_t zero = 0xf0;
-uint8_t one = 0x0f;
 
 //rx
 uint8_t preambleIn;
@@ -46,10 +47,8 @@ void resetBuffer(char * buffer){
 	}
 }
 
-
 /*
- *  sends each byte as 2 bits
- *  baud rate = 8000 -> each half byte sends in 500us to act like one bit
+ *
  *
  */
 void sendData(char * data, int length){
@@ -62,11 +61,9 @@ void sendData(char * data, int length){
 	for(int x = 0; x < byteLenght; x++){
 		if(((preamble<<x) & 0x80) == 0x80){
 			//printf("1");
-			//HAL_UART_Transmit(&huart2, (uint8_t *)&one, 1, HAL_MAX_DELAY);
 			HAL_GPIO_WritePin(GPIOA, GPIO_PIN_10, GPIO_PIN_RESET);
 		} else if(((preamble<<x) & 0x80) == 0x00){
 			//printf("0");
-			//HAL_UART_Transmit(&huart2, (uint8_t *)&zero, 1, HAL_MAX_DELAY);
 			HAL_GPIO_WritePin(GPIOA, GPIO_PIN_10, GPIO_PIN_SET);
 		}
 		delay_us(500);
@@ -77,10 +74,8 @@ void sendData(char * data, int length){
 	//send length
 	for(int x = 0; x < byteLenght; x++){
 		if(((dataLength<<x) & 0x80) == 0x80){
-			//HAL_UART_Transmit(&huart2, (uint8_t *)&one, 1, HAL_MAX_DELAY);
 			HAL_GPIO_WritePin(GPIOA, GPIO_PIN_10, GPIO_PIN_RESET);
 		} else if(((dataLength<<x) & 0x80) == 0x00){
-			//HAL_UART_Transmit(&huart2, (uint8_t *)&zero, 1, HAL_MAX_DELAY);
 			HAL_GPIO_WritePin(GPIOA, GPIO_PIN_10, GPIO_PIN_SET);
 		}
 		delay_us(500);
@@ -92,10 +87,8 @@ void sendData(char * data, int length){
 	for(int x = 0; x < dataLength; x++){
 		for(int y = 0; y < byteLenght; y++){
 			if(((data[x]<<y) & 0x80) == 0x80){
-				//HAL_UART_Transmit(&huart2, (uint8_t *)&one, 1, HAL_MAX_DELAY);
 				HAL_GPIO_WritePin(GPIOA, GPIO_PIN_10, GPIO_PIN_RESET);
 			} else if(((data[x]<<y) & 0x80) == 0x00){
-				//HAL_UART_Transmit(&huart2, (uint8_t *)&zero, 1, HAL_MAX_DELAY);
 				HAL_GPIO_WritePin(GPIOA, GPIO_PIN_10, GPIO_PIN_SET);
 			}
 			delay_us(500);
@@ -108,7 +101,7 @@ void sendData(char * data, int length){
 
 
 void rxRead(){
-
+	  receiveFlag = true;
 	  rxPin = (int)HAL_GPIO_ReadPin(RX_PIN_GPIO_Port, RX_PIN_Pin);
 //	  printf("%d",rxPin);
 	  resetTimer();
@@ -150,6 +143,7 @@ void processData(void)
 		index++;
 	}
 	preamble = preamble>>1;
+	//printf("%d", preamble);
 
 	if(preamble == 0x55)
 	{
@@ -164,6 +158,8 @@ void processData(void)
 		}
 		length = length>>1;
 
+		//printLength = length;
+
 		while((dataRead[index] != 2) && (index != 255))
 		{
 			for(int i=0; (i<8) && (dataRead[index] != 2); i++)
@@ -177,10 +173,31 @@ void processData(void)
 			}
 			data = data>>1;
 			printf("%c", (char)data);
+//			dataReceived[num] = data;
+//			num++;
+			//printf("%c", data);
 			data = 0;
 		}
 	}
 	// check if length correct
+	printf("\n");
 
 	cnt = 0;
+	num = 0;
+	 receiveFlag = false;
+}
+
+bool receiveStatus(){
+	return receiveFlag;
+}
+
+void printReceived(){
+	for(int i = 0; i < printLength; i++){
+		//printf("%c", dataReceived[i]);
+//		if(dataReceived[i+1] == (NULL)){
+//			i = 300;
+//		}
+	}
+	//printf("\n");
+	receiveFlag = true;
 }
