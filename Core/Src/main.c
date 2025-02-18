@@ -122,25 +122,25 @@ int main(void)
 
   //TEST
 	char rxString[255];
-	int length = 29;
-	int x = 0;//CHANGED FROM 0
+	int length = 2;
+	int x = 0;
 
 	initTimer();
 
 	HAL_GPIO_WritePin(GPIOA, GPIO_PIN_10, GPIO_PIN_SET);
 
-	while(x<26){
-		rxString[x] = (char)(x+65);
-		x++;
-	}
-	x=1;
-	while(x<6){
-		rxString[x+25] = (char)(x+48);
-		x++;
-	}
+//	while(x<26){
+//		rxString[x] = (char)(x+65);
+//		x++;
+//	}
+//	x=1;
+//	while(x<6){
+//		rxString[x+25] = (char)(x+48);
+//		x++;
+//	}
 
-//	rxString[0] = 'o';
-//	rxString[1] = 'k';
+	rxString[0] = 'H';
+	rxString[1] = 'i';
 
 	sendData(rxString, length);
 
@@ -152,11 +152,6 @@ int main(void)
 	//printf("wait \n");
 
 	while (1) {
-
-		if(!(receiveStatus())){
-				printReceived();
-
-		}
 
 //		uint8_t data;
 

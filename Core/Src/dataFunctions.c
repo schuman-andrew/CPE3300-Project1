@@ -16,10 +16,7 @@
 
 //static volatile EXTI_TypeDef* const exti = (EXTI_TypeDef*) EXTI_BASE;
 
-char dataReceived[255];
-bool receiveFlag = true;
 int printLength;
-int num = 0;
 
 //tx
 uint8_t preamble = 0x55;
@@ -173,9 +170,6 @@ void processData(void)
 			}
 			data = data>>1;
 			printf("%c", (char)data);
-//			dataReceived[num] = data;
-//			num++;
-			//printf("%c", data);
 			data = 0;
 		}
 	}
@@ -184,20 +178,4 @@ void processData(void)
 
 	cnt = 0;
 	num = 0;
-	 receiveFlag = false;
-}
-
-bool receiveStatus(){
-	return receiveFlag;
-}
-
-void printReceived(){
-	for(int i = 0; i < printLength; i++){
-		//printf("%c", dataReceived[i]);
-//		if(dataReceived[i+1] == (NULL)){
-//			i = 300;
-//		}
-	}
-	//printf("\n");
-	receiveFlag = true;
 }
