@@ -34,6 +34,17 @@ static int cnt = 0;
 
 static int rxPin;
 extern int timerInt;
+
+/* CHANNEL MONITOR
+ * idle - 1 (while busy)
+ * busy - any signal edge (while in idle or collision)
+ * collision - logic 0 for 1.1bit period (while busy)
+ *
+ * need to indicate current state
+ * */
+enum state busState = IDLE;
+
+
 //static int edgeTrigger;
 /* resetBuffer
  *
@@ -49,6 +60,7 @@ void resetBuffer(char * buffer){
  *
  */
 void sendData(char * data, int length){
+
 	dataLength = (uint8_t) length;
 
 	//HAL_GPIO_WritePin(GPIOx, GPIO_Pin, PinState); w/ hal delay
@@ -98,7 +110,8 @@ void sendData(char * data, int length){
 
 
 void rxRead(){
-	  receiveFlag = true;
+	 busState = BUSY;
+
 	  rxPin = (int)HAL_GPIO_ReadPin(RX_PIN_GPIO_Port, RX_PIN_Pin);
 //	  printf("%d",rxPin);
 	  resetTimer();
@@ -177,5 +190,4 @@ void processData(void)
 	printf("\n");
 
 	cnt = 0;
-	num = 0;
 }

@@ -11,6 +11,12 @@
 #include "gpio.h"
 #include "stdbool.h"
 
+enum state{
+	IDLE,
+	BUSY,
+	COLLISION
+};
+
 void resetBuffer(char * buffer);
 
 void sendData(char * data, int length);
