@@ -8,6 +8,8 @@
 #ifndef INC_TIMER_H_
 #define INC_TIMER_H_
 
+#include "dataFunctions.h"
+
 #define F_CPU 16000000UL
 #define EXTI12 1<<12
 #define GPIOA_EN 1<<0

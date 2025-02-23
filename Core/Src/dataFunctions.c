@@ -35,19 +35,19 @@ static int cnt = 0;
 static int rxPin;
 extern int timerInt;
 
+
 /* CHANNEL MONITOR
  * idle - 1 (while busy)
  * busy - any signal edge (while in idle or collision)
  * collision - logic 0 for 1.1bit period (while busy)
  *
  * need to indicate current state
- * */
+ */
 enum state busState = IDLE;
 
 
-//static int edgeTrigger;
 /* resetBuffer
- *
+ * -resets realterm input buffer
  */
 void resetBuffer(char * buffer){
 	for(int x=0; x<256; x++){
@@ -63,16 +63,11 @@ void sendData(char * data, int length){
 
 	dataLength = (uint8_t) length;
 
-	//HAL_GPIO_WritePin(GPIOx, GPIO_Pin, PinState); w/ hal delay
-	//other option
-
 	//send preamble
 	for(int x = 0; x < byteLenght; x++){
 		if(((preamble<<x) & 0x80) == 0x80){
-			//printf("1");
 			HAL_GPIO_WritePin(GPIOA, GPIO_PIN_10, GPIO_PIN_RESET);
 		} else if(((preamble<<x) & 0x80) == 0x00){
-			//printf("0");
 			HAL_GPIO_WritePin(GPIOA, GPIO_PIN_10, GPIO_PIN_SET);
 		}
 		delay_us(500);
@@ -109,28 +104,38 @@ void sendData(char * data, int length){
 }
 
 
-void rxRead(){
+void setBusy(){
 	 busState = BUSY;
+}
+
+
+state getState(){
+	return busState;
+}
+
+
+void rxRead(){
 
 	  rxPin = (int)HAL_GPIO_ReadPin(RX_PIN_GPIO_Port, RX_PIN_Pin);
 //	  printf("%d",rxPin);
 	  resetTimer();
 	  timerInt = 0;
 	  cnt++;
-//	  if(cnt == 50){
-//		  disableTimer();
-//		  exti->IMR = 0;
-//	  }
-//	  printf(" %d ", getTime());
+	//	  if(cnt == 50){
+	//		  disableTimer();
+	//		  exti->IMR = 0;
+	//	  }
+	//	  printf(" %d ", getTime());
 
-	  // reset timer
-//	  resetTimer();
-	  // save data
+		  // reset timer
+	//	  resetTimer();
+		  // save data
 	  dataRead[cnt] = (uint8_t) rxPin;
 	  dataRead[cnt+1] = 2;
-//	  printf("%d", (int) dataRead[cnt]);
+	//	  printf("%d", (int) dataRead[cnt]);
 
 }
+
 
 void processData(void)
 {

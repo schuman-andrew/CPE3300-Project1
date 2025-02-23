@@ -21,7 +21,13 @@ void resetBuffer(char * buffer);
 
 void sendData(char * data, int length);
 
+void setBusy();
+
+state getState();
+
 void rxRead(void);
+
+bool collisionMonitor(int input);
 
 void processData(void);
 

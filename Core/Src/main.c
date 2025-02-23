@@ -258,9 +258,10 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
 //	printf("%d", (int)HAL_GPIO_ReadPin(RX_PIN_GPIO_Port, GPIO_Pin));
 	tim5->CR1 |= CEN;
 
-	if (timerFlag)
+	if (timerFlag && (getState() != COLLISION))
 	{
 		timerFlag = false;
+		setBusy();
 		rxRead();
 	}
 //	exti->IMR = 0;
