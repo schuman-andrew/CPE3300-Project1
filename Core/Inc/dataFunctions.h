@@ -31,4 +31,6 @@ bool collisionMonitor(int input);
 
 void processData(void);
 
+void monitorPin(enum state s);
+
 #endif /* INC_DATAFUNCTIONS_H_ */

@@ -27,6 +27,12 @@ int timerInt = 0;
 //static int rxPin;
 extern bool timerFlag;
 
+void resetMonitor(){
+	monitor[0] = 2;
+	monitor[1] = 2;
+	monitor[2] = 2;
+}
+
 void initTimer(void)
 {
 	rcc->APB1ENR |= TIM5EN;
@@ -74,19 +80,23 @@ void TIM5_IRQHandler(void)
 		if(stateIndicator == 1){
 			setState(COLLISION);
 			disableTimer();
-			//set pin
+			monitorPin(COLLISION);
+			resetMonitor();
 		}
 		else if(stateIndicator == 2 && (getState() == COLLISION)){
 			setState(IDLE);
 			disableTimer();
-			//set pin
+			monitorPin(IDLE);
+			resetMonitor();
 		}
-		else
+		else {
 //		printf("Here");
 			processData();
 			disableTimer();
-	}
+			resetMonitor();
+		}
 //	rxRead();
+	}
 }
 
 int stateMonitor(int input){
@@ -110,20 +120,16 @@ int stateMonitor(int input){
 	if(monitor[maxMonitorIndex] == 0){
 		collCheck++;
 		//idleCheck = 0;
-	} else if (monitor[maxMonitorIndex] == 1){
+	}
+	else if (monitor[maxMonitorIndex] == 1){
 		idleCheck++;
 		//collCheck = 0;
 	}
 
 	if(collCheck == 3){
-//		monitor[0] = 2;
-//		monitor[1] = 2;
-//		monitor[2] = 2;
 		return 1;
-	} else if(idleCheck == 3){
-//		monitor[0] = 2;
-//		monitor[1] = 2;
-//		monitor[2] = 2;
+	}
+	else if(idleCheck == 3){
 		return 2;
 	}
 	return 0;

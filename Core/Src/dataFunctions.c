@@ -43,6 +43,10 @@ extern int timerInt;
  * collision - logic 0 for 1.1bit period (while busy)
  *
  * need to indicate current state
+ *
+ * PB8 | D15 - IDLE
+ * PB9 | D14 - BUSY
+ * PB6 | D10 - COLLISION
  */
 enum state busState = IDLE;
 
@@ -234,11 +238,26 @@ void processData(void)
 			data = 0;
 		}
 	}
+
 	setState(IDLE);
-	//set pin
+	monitorPin(IDLE);
 
 	// check if length correct
 	printf("\n");
 
 	cnt = 0;
+}
+
+void monitorPin(enum state s){
+	HAL_GPIO_WritePin(GPIOB, IDLE_Pin, GPIO_PIN_RESET);
+	HAL_GPIO_WritePin(GPIOB, BUSY_Pin, GPIO_PIN_RESET);
+	HAL_GPIO_WritePin(GPIOB, COLLISION_Pin, GPIO_PIN_RESET);
+
+	if(s == IDLE){
+		HAL_GPIO_WritePin(GPIOB, IDLE_Pin, GPIO_PIN_SET);
+	} else if(s == BUSY){
+		HAL_GPIO_WritePin(GPIOB, BUSY_Pin, GPIO_PIN_SET);
+	} else if(s == COLLISION){
+		HAL_GPIO_WritePin(GPIOB, COLLISION_Pin, GPIO_PIN_SET);
+	}
 }

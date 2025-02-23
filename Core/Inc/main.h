@@ -72,6 +72,12 @@ void Error_Handler(void);
 #define RX_PIN_Pin GPIO_PIN_3
 #define RX_PIN_GPIO_Port GPIOB
 #define RX_PIN_EXTI_IRQn EXTI3_IRQn
+#define COLLISION_Pin GPIO_PIN_6
+#define COLLISION_GPIO_Port GPIOB
+#define IDLE_Pin GPIO_PIN_8
+#define IDLE_GPIO_Port GPIOB
+#define BUSY_Pin GPIO_PIN_9
+#define BUSY_GPIO_Port GPIOB
 
 /* USER CODE BEGIN Private defines */
 

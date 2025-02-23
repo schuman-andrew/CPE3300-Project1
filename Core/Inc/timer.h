@@ -37,4 +37,7 @@ void initTimer(void);
 int getTime(void);
 void resetTimer(void);
 void disableTimer(void);
+
+int stateMonitor(int input);
+
 #endif /* INC_TIMER_H_ */
