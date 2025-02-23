@@ -142,6 +142,7 @@ int main(void)
 	rxString[0] = 'H';
 	rxString[1] = 'i';
 
+	//check if idle before
 	sendData(rxString, length);
 
 	HAL_GPIO_WritePin(GPIOA, GPIO_PIN_10, GPIO_PIN_SET);
@@ -258,11 +259,14 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
 //	printf("%d", (int)HAL_GPIO_ReadPin(RX_PIN_GPIO_Port, GPIO_Pin));
 	tim5->CR1 |= CEN;
 
-	if (timerFlag && (getState() != COLLISION))
+	if (timerFlag)
 	{
 		timerFlag = false;
-		setState(BUSY);
-		rxRead();
+
+		if(getState() != COLLISION){
+			setState(BUSY);
+			rxRead();
+		}
 	}
 //	exti->IMR = 0;
 

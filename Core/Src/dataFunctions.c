@@ -13,6 +13,7 @@
 #include "stdbool.h"
 #include "timer.h"
 #include "stm32f411xe.h"
+#include <stdlib.h>
 
 //static volatile EXTI_TypeDef* const exti = (EXTI_TypeDef*) EXTI_BASE;
 
@@ -48,11 +49,20 @@ enum state busState = IDLE;
 
 /* resetBuffer
  * -resets realterm input buffer
+ *
  */
 void resetBuffer(char * buffer){
 	for(int x=0; x<256; x++){
 		buffer[x] = 0;
 	}
+}
+
+void wait(){
+	int Nmax = 1000;
+	int N = rand() % (Nmax+1);
+
+	int t = (N/Nmax); //in ms
+	delay_ms(t);
 }
 
 /*
@@ -65,42 +75,75 @@ void sendData(char * data, int length){
 
 	//send preamble
 	for(int x = 0; x < byteLenght; x++){
-		if(((preamble<<x) & 0x80) == 0x80){
-			HAL_GPIO_WritePin(GPIOA, GPIO_PIN_10, GPIO_PIN_RESET);
-		} else if(((preamble<<x) & 0x80) == 0x00){
-			HAL_GPIO_WritePin(GPIOA, GPIO_PIN_10, GPIO_PIN_SET);
-		}
-		delay_us(500);
-		HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_10);
-		delay_us(500);
-	}
-
-	//send length
-	for(int x = 0; x < byteLenght; x++){
-		if(((dataLength<<x) & 0x80) == 0x80){
-			HAL_GPIO_WritePin(GPIOA, GPIO_PIN_10, GPIO_PIN_RESET);
-		} else if(((dataLength<<x) & 0x80) == 0x00){
-			HAL_GPIO_WritePin(GPIOA, GPIO_PIN_10, GPIO_PIN_SET);
-		}
-		delay_us(500);
-		HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_10);
-		delay_us(500);
-	}
-
-	//send data
-	for(int x = 0; x < dataLength; x++){
-		for(int y = 0; y < byteLenght; y++){
-			if(((data[x]<<y) & 0x80) == 0x80){
+		if(getState() != COLLISION){
+			if(((preamble<<x) & 0x80) == 0x80){
 				HAL_GPIO_WritePin(GPIOA, GPIO_PIN_10, GPIO_PIN_RESET);
-			} else if(((data[x]<<y) & 0x80) == 0x00){
+			} else if(((preamble<<x) & 0x80) == 0x00){
 				HAL_GPIO_WritePin(GPIOA, GPIO_PIN_10, GPIO_PIN_SET);
 			}
 			delay_us(500);
 			HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_10);
 			delay_us(500);
+		} else {// if collision then exit all loops
+			x = 100;
 		}
 	}
+
+	//send length
+	for(int x = 0; x < byteLenght; x++){
+		if(getState() != COLLISION){
+			if(((dataLength<<x) & 0x80) == 0x80){
+				HAL_GPIO_WritePin(GPIOA, GPIO_PIN_10, GPIO_PIN_RESET);
+			} else if(((dataLength<<x) & 0x80) == 0x00){
+				HAL_GPIO_WritePin(GPIOA, GPIO_PIN_10, GPIO_PIN_SET);
+			}
+			delay_us(500);
+			HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_10);
+			delay_us(500);
+		} else {
+			x = 100;
+		}
+	}
+
+	//send data
+	for(int x = 0; x < dataLength; x++){
+		for(int y = 0; y < byteLenght; y++){
+			if(getState() != COLLISION){
+				if(((data[x]<<y) & 0x80) == 0x80){
+					HAL_GPIO_WritePin(GPIOA, GPIO_PIN_10, GPIO_PIN_RESET);
+				} else if(((data[x]<<y) & 0x80) == 0x00){
+					HAL_GPIO_WritePin(GPIOA, GPIO_PIN_10, GPIO_PIN_SET);
+				}
+				delay_us(500);
+				HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_10);
+				delay_us(500);
+			}
+			else {
+				x = 300;
+				y = 100;
+			}
+		}
+	}
+
 	HAL_GPIO_WritePin(GPIOA, GPIO_PIN_10, GPIO_PIN_SET);
+
+	if(getState() == COLLISION){
+
+		bool dataSent = false;
+
+		while(getState() == COLLISION){
+			//ends when set back to idle
+		}
+		while(!dataSent){
+
+			wait();
+
+			if(getState() == IDLE){
+				sendData(data, length);
+				dataSent = true;
+			}
+		}
+	}
 }
 
 
@@ -191,6 +234,9 @@ void processData(void)
 			data = 0;
 		}
 	}
+	setState(IDLE);
+	//set pin
+
 	// check if length correct
 	printf("\n");
 

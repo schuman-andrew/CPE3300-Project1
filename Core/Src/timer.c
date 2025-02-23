@@ -21,7 +21,7 @@ static volatile NVIC_REG* const nvic = (NVIC_REG*) NVICBASE;
 
 int monitor[3] = {2,2,2};
 int maxMonitorIndex = 2;
-bool collision = false;
+int stateIndicator = 0;
 
 int timerInt = 0;
 //static int rxPin;
@@ -66,38 +66,65 @@ void TIM5_IRQHandler(void)
 	timerFlag = true;
 	timerInt++;
 
-	collision = collisionMonitor(HAL_GPIO_ReadPin(RX_PIN_GPIO_Port, RX_PIN_Pin));
+	stateIndicator = stateMonitor(HAL_GPIO_ReadPin(RX_PIN_GPIO_Port,
+			RX_PIN_Pin));
 
-	if(collision == true){
-		setState(COLLISION);
-		disableTimer();
-	}
-	else if(timerInt > 3)
+	if(timerInt > 2)
 	{
+		if(stateIndicator == 1){
+			setState(COLLISION);
+			disableTimer();
+			//set pin
+		}
+		else if(stateIndicator == 2 && (getState() == COLLISION)){
+			setState(IDLE);
+			disableTimer();
+			//set pin
+		}
+		else
 //		printf("Here");
-		processData();
-		disableTimer();
+			processData();
+			disableTimer();
 	}
 //	rxRead();
 }
 
-bool collisionMonitor(int input){
+int stateMonitor(int input){
 	int collCheck = 0;
+	int idleCheck = 0;
 
 	for(int x = 0; x<maxMonitorIndex; x++){
-		monitor[x] = monitor[x-1];
+
+		monitor[x] = monitor[x+1];
+
 		if(monitor[x] == 0){
 			collCheck++;
+			idleCheck = 0;
+		} else if (monitor[x] == 1){
+			idleCheck++;
+			collCheck = 0;
 		}
 	}
 	monitor[maxMonitorIndex] = input;
 
 	if(monitor[maxMonitorIndex] == 0){
 		collCheck++;
+		//idleCheck = 0;
+	} else if (monitor[maxMonitorIndex] == 1){
+		idleCheck++;
+		//collCheck = 0;
 	}
 
-	if(collCheck ==3){
-		return true;
+	if(collCheck == 3){
+//		monitor[0] = 2;
+//		monitor[1] = 2;
+//		monitor[2] = 2;
+		return 1;
+	} else if(idleCheck == 3){
+//		monitor[0] = 2;
+//		monitor[1] = 2;
+//		monitor[2] = 2;
+		return 2;
 	}
-	return false;
+	return 0;
 }
