@@ -261,7 +261,7 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
 	if (timerFlag && (getState() != COLLISION))
 	{
 		timerFlag = false;
-		setBusy();
+		setState(BUSY);
 		rxRead();
 	}
 //	exti->IMR = 0;

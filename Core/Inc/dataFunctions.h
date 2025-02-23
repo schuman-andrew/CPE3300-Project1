@@ -21,9 +21,9 @@ void resetBuffer(char * buffer);
 
 void sendData(char * data, int length);
 
-void setBusy();
+void setState(enum state state);
 
-state getState();
+enum state getState();
 
 void rxRead(void);
 

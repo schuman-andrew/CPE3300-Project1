@@ -104,12 +104,12 @@ void sendData(char * data, int length){
 }
 
 
-void setBusy(){
-	 busState = BUSY;
+void setState(enum state state){
+	 busState = state;
 }
 
 
-state getState(){
+enum state getState(){
 	return busState;
 }
 

@@ -69,6 +69,7 @@ void TIM5_IRQHandler(void)
 	collision = collisionMonitor(HAL_GPIO_ReadPin(RX_PIN_GPIO_Port, RX_PIN_Pin));
 
 	if(collision == true){
+		setState(COLLISION);
 		disableTimer();
 	}
 	else if(timerInt > 3)
