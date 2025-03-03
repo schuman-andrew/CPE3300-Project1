@@ -1,8 +1,13 @@
 /* USER CODE BEGIN Header */
 /**
  ******************************************************************************
- * @file           : main.c
- * @brief          : Main program body
+ 	* @file : main.c
+  	* @date : Feb 1, 2025
+	* @author : Andrew Schuman & Matt Andersen
+	* @course : CPE3300
+	* @section : 111
+	* @assignment : Project 1 Network Interface Node
+	* @brief : initializes all peripherals and sends data
  ******************************************************************************
  * @attention
  *
@@ -250,13 +255,13 @@ void SystemClock_Config(void)
 }
 
 /* USER CODE BEGIN 4 */
-
+/*
+ * @brief starts timer on edge and reads rx pin
+ */
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
 	/* Prevent unused argument(s) compilation warning */
-	//UNUSED(GPIO_Pin);
 	//reset/set timer, check if it is >480us
 	//skip next edge
-//	printf("%d", (int)HAL_GPIO_ReadPin(RX_PIN_GPIO_Port, GPIO_Pin));
 	tim5->CR1 |= CEN;
 
 	if (timerFlag)
@@ -269,16 +274,6 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
 			rxRead();
 		}
 	}
-//	exti->IMR = 0;
-
-//	for(int i=0; i<50; i++)
-//	{
-//		printf("%d", (int)HAL_GPIO_ReadPin(RX_PIN_GPIO_Port, GPIO_Pin));
-//		delay_us(1000);
-//	}
-
-	// GPIO_PIN_RESET
-	// GPIO_PIN_SET
 
 }
 
