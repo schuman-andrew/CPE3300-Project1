@@ -25,7 +25,7 @@ static volatile NVIC_REG* const nvic = (NVIC_REG*) NVICBASE;
 int monitor[3] = {2,2,2};
 int maxMonitorIndex = 2;
 int stateIndicator = 0;
-
+extern bool firstFlag;
 int timerInt = 0;
 //static int rxPin;
 extern bool timerFlag;
@@ -54,8 +54,8 @@ void initTimer(void)
 	tim5->DIER |= 0x1;
 	nvic->ISER1 |= (1<<18);
 
-	tim5->ARR  = 0x14444;
-	tim5->CCR1 = 0x14444;
+	tim5->ARR  = 0x15000; // 0x14444;
+	tim5->CCR1 = 0x15000; // 0x14444;
 	tim5->CCER |= CC1E;
 
 //    tim5->CR1 |= CEN;
@@ -76,14 +76,23 @@ int getTime(void)
 void resetTimer(void)
 {
 	tim5->CNT = 0;
+	timerInt = 0;
 }
 
 /*
- *  @brief sets timer enable to
+ *  @brief sets timer enable bit to zero, disabling timer 5
  */
 void disableTimer(void)
 {
 	tim5->CR1 &= ~CEN;
+}
+
+/*
+ * @brief sets timer enable bit to one, enabling timer 5
+ */
+void enableTimer(void)
+{
+	tim5->CR1 |= CEN;
 }
 
 /*
@@ -98,29 +107,26 @@ void TIM5_IRQHandler(void)
 	timerFlag = true;
 	timerInt++;
 
-	stateIndicator = stateMonitor(HAL_GPIO_ReadPin(RX_PIN_GPIO_Port,
-			RX_PIN_Pin));
+//	stateIndicator = stateMonitor(HAL_GPIO_ReadPin(RX_PIN_GPIO_Port,
+//			RX_PIN_Pin));
 
-	if(timerInt > 2)
+	if(timerInt > 1)
 	{
-		if(stateIndicator == 1){
+		if((int)HAL_GPIO_ReadPin(RX_PIN_GPIO_Port, RX_PIN_Pin) == 0){
 			setState(COLLISION);
-			disableTimer();
 			monitorPin(COLLISION);
-			resetMonitor();
 		}
-		else if(stateIndicator == 2 && (getState() == COLLISION)){
+		else if(((int)HAL_GPIO_ReadPin(RX_PIN_GPIO_Port, RX_PIN_Pin) == 1) && (getState() == COLLISION)){
 			setState(IDLE);
-			disableTimer();
 			monitorPin(IDLE);
-			resetMonitor();
 		}
 		else {
 //		printf("Here");
 			processData();
-			disableTimer();
-			resetMonitor();
 		}
+		disableTimer();
+		resetMonitor();
+		firstFlag = true;
 //	rxRead();
 	}
 }

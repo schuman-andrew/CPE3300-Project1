@@ -61,7 +61,7 @@ static volatile EXTI_TypeDef* const exti = (EXTI_TypeDef*) EXTI_BASE;
 
 /* USER CODE BEGIN PV */
 bool timerFlag = true;
-static int rxPin;
+bool firstFlag = true;
 int count = 0;
 
 /* USER CODE END PV */
@@ -262,17 +262,17 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
 	/* Prevent unused argument(s) compilation warning */
 	//reset/set timer, check if it is >480us
 	//skip next edge
-	tim5->CR1 |= CEN;
+	enableTimer();
 
 	if (timerFlag)
 	{
 		timerFlag = false;
 
-		if(getState() != COLLISION){
+//		if(getState() != COLLISION){
 			setState(BUSY);
 			monitorPin(BUSY);
 			rxRead();
-		}
+//		}
 	}
 
 }

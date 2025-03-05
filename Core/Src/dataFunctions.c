@@ -35,6 +35,7 @@ bool lengthRx;
 uint8_t dataIn[255];
 uint8_t dataRead[255];
 static int cnt = 0;
+int fails = 0;
 
 static int rxPin;
 extern int timerInt;
@@ -137,9 +138,10 @@ void sendData(char * data, int length){
 
 	HAL_GPIO_WritePin(GPIOA, GPIO_PIN_10, GPIO_PIN_SET);
 
-	if(getState() == COLLISION){
-
+	if((getState() == COLLISION) && (fails < 5)){
+		printf("%d/n", fails);
 		bool dataSent = false;
+		fails++;
 
 		while(getState() == COLLISION){
 			//ends when set back to idle
@@ -153,6 +155,11 @@ void sendData(char * data, int length){
 				dataSent = true;
 			}
 		}
+	}
+	else if (fails == 5)
+	{
+		printf("Transmission Timeout\n");
+		fails++;
 	}
 }
 
@@ -184,11 +191,10 @@ void rxRead(){
 	  rxPin = (int)HAL_GPIO_ReadPin(RX_PIN_GPIO_Port, RX_PIN_Pin);
 
 	  resetTimer();
-	  timerInt = 0;
-	  cnt++;
 
 	  dataRead[cnt] = (uint8_t) rxPin;
-	  dataRead[cnt+1] = 2;
+	  cnt++;
+	  dataRead[cnt] = 2;
 }
 
 /*
@@ -206,7 +212,7 @@ void processData(void)
 	uint32_t data = 0;
 
 	//check preamble
-	while((dataRead[index] != 2) && (index < 9))
+	while((dataRead[index] != 2) && (index < 8))
 	{
 		if(dataRead[index] == 1)
 		{
@@ -219,7 +225,7 @@ void processData(void)
 
 	if(preamble == 0x55)
 	{
-		while((dataRead[index] != 2) && (index > 8) && (index < 17))
+		while((dataRead[index] != 2) && (index > 7) && (index < 16))
 		{
 			if(dataRead[index] == 1)
 			{
@@ -265,15 +271,18 @@ void processData(void)
  * @param s current state of node
  */
 void monitorPin(enum state s){
-	HAL_GPIO_WritePin(GPIOB, IDLE_Pin, GPIO_PIN_RESET);
-	HAL_GPIO_WritePin(GPIOB, BUSY_Pin, GPIO_PIN_RESET);
-	HAL_GPIO_WritePin(GPIOB, COLLISION_Pin, GPIO_PIN_RESET);
 
 	if(s == IDLE){
 		HAL_GPIO_WritePin(GPIOB, IDLE_Pin, GPIO_PIN_SET);
+		HAL_GPIO_WritePin(GPIOB, BUSY_Pin, GPIO_PIN_RESET);
+		HAL_GPIO_WritePin(GPIOB, COLLISION_Pin, GPIO_PIN_RESET);
 	} else if(s == BUSY){
 		HAL_GPIO_WritePin(GPIOB, BUSY_Pin, GPIO_PIN_SET);
+		HAL_GPIO_WritePin(GPIOB, IDLE_Pin, GPIO_PIN_RESET);
+		HAL_GPIO_WritePin(GPIOB, COLLISION_Pin, GPIO_PIN_RESET);
 	} else if(s == COLLISION){
 		HAL_GPIO_WritePin(GPIOB, COLLISION_Pin, GPIO_PIN_SET);
+		HAL_GPIO_WritePin(GPIOB, IDLE_Pin, GPIO_PIN_RESET);
+		HAL_GPIO_WritePin(GPIOB, BUSY_Pin, GPIO_PIN_RESET);
 	}
 }
