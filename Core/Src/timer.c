@@ -25,7 +25,6 @@ static volatile NVIC_REG* const nvic = (NVIC_REG*) NVICBASE;
 int monitor[3] = {2,2,2};
 int maxMonitorIndex = 2;
 int stateIndicator = 0;
-extern bool firstFlag;
 int timerInt = 0;
 //static int rxPin;
 extern bool timerFlag;
@@ -121,12 +120,10 @@ void TIM5_IRQHandler(void)
 			monitorPin(IDLE);
 		}
 		else {
-//		printf("Here");
 			processData();
 		}
 		disableTimer();
 		resetMonitor();
-		firstFlag = true;
 //	rxRead();
 	}
 }

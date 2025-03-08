@@ -139,7 +139,7 @@ void sendData(char * data, int length){
 	HAL_GPIO_WritePin(GPIOA, GPIO_PIN_10, GPIO_PIN_SET);
 
 	if((getState() == COLLISION) && (fails < 5)){
-		printf("%d/n", fails);
+//		printf("%d/n", fails);
 		bool dataSent = false;
 		fails++;
 
@@ -158,7 +158,7 @@ void sendData(char * data, int length){
 	}
 	else if (fails == 5)
 	{
-		printf("Transmission Timeout\n");
+//		printf("Transmission Timeout\n");
 		fails++;
 	}
 }

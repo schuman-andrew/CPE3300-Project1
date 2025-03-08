@@ -20,14 +20,11 @@
  *
  ******************************************************************************
  */
-/* USER CODE END Header */
+
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 #include "usart.h"
 #include "gpio.h"
-
-/* Private includes ----------------------------------------------------------*/
-/* USER CODE BEGIN Includes */
 #include <stdio.h>
 #include "string.h"
 #include "dataFunctions.h"
@@ -35,58 +32,24 @@
 #include "timer.h"
 #include "stm32f411xe.h"
 #include "delay.h"
+#include "console.h"
+#include "uart_driver.h"
 
-/* USER CODE END Includes */
-
-/* Private typedef -----------------------------------------------------------*/
-/* USER CODE BEGIN PTD */
-//#define PUTCHAR_PROTOTYPE int __io_putchar(int ch)
-//#define GETCHAR_PROTOTYPE int __io_getchar(void)
-
-static volatile TIM_TypeDef* const tim5 = (TIM_TypeDef*) TIM5_BASE;
-static volatile EXTI_TypeDef* const exti = (EXTI_TypeDef*) EXTI_BASE;
-/* USER CODE END PTD */
-
-/* Private define ------------------------------------------------------------*/
-/* USER CODE BEGIN PD */
-
-/* USER CODE END PD */
-
-/* Private macro -------------------------------------------------------------*/
-/* USER CODE BEGIN PM */
-
-/* USER CODE END PM */
-
-/* Private variables ---------------------------------------------------------*/
-
-/* USER CODE BEGIN PV */
+/* Variables ------------------------------------------------------------------*/
 bool timerFlag = true;
-bool firstFlag = true;
-int count = 0;
-
-/* USER CODE END PV */
-
-/* Private function prototypes -----------------------------------------------*/
-void SystemClock_Config(void);
-/* USER CODE BEGIN PFP */
-
-/* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
-/* USER CODE BEGIN 0 */
-PUTCHAR_PROTOTYPE {
-	HAL_UART_Transmit(&huart2, (uint8_t*) &ch, 1, HAL_MAX_DELAY);
-	return ch;
-}
-
-GETCHAR_PROTOTYPE {
-	uint8_t ch = 0;
-	__HAL_UART_CLEAR_OREFLAG(&huart2);
-	HAL_UART_Receive(&huart2, (uint8_t*) &ch, 1, HAL_MAX_DELAY);
-	return ch;
-}
-
-/* USER CODE END 0 */
+//PUTCHAR_PROTOTYPE {
+//	HAL_UART_Transmit(&huart2, (uint8_t*) &ch, 1, HAL_MAX_DELAY);
+//	return ch;
+//}
+//
+//GETCHAR_PROTOTYPE {
+//	uint8_t ch = 0;
+//	__HAL_UART_CLEAR_OREFLAG(&huart2);
+//	HAL_UART_Receive(&huart2, (uint8_t*) &ch, 1, HAL_MAX_DELAY);
+//	return ch;
+//}
 
 /**
   * @brief  The application entry point.
@@ -94,118 +57,92 @@ GETCHAR_PROTOTYPE {
   */
 int main(void)
 {
-
-  /* USER CODE BEGIN 1 */
-	setvbuf(stdin, NULL, _IONBF, 0);
-  /* USER CODE END 1 */
+//	setvbuf(stdin, NULL, _IONBF, 0);
 
   /* MCU Configuration--------------------------------------------------------*/
 
   /* Reset of all peripherals, Initializes the Flash interface and the Systick. */
-  HAL_Init();
-
-  /* USER CODE BEGIN Init */
-
-  /* USER CODE END Init */
+	HAL_Init();
 
   /* Configure the system clock */
-  SystemClock_Config();
-
-  /* USER CODE BEGIN SysInit */
-  /* USER CODE END SysInit */
+//	SystemClock_Config();
 
   /* Initialize all configured peripherals */
-  MX_GPIO_Init();
-  MX_USART2_UART_Init();
-  /* USER CODE BEGIN 2 */
-
-  /* USER CODE END 2 */
-
-  /* Infinite loop */
-  /* USER CODE BEGIN WHILE */
-
-
-  //TEST
-	char rxString[255];
-	int length = 2;
-	int x = 0;
+	MX_GPIO_Init();
+//	MX_USART2_UART_Init();
 
 	initTimer();
 
 	HAL_GPIO_WritePin(GPIOA, GPIO_PIN_10, GPIO_PIN_SET);
 
-//	while(x<26){
-//		rxString[x] = (char)(x+65);
-//		x++;
-//	}
-//	x=1;
-//	while(x<6){
-//		rxString[x+25] = (char)(x+48);
-//		x++;
-//	}
-
-	rxString[0] = 'H';
-	rxString[1] = 'i';
-
-	//check if idle before
-	sendData(rxString, length);
-
-	HAL_GPIO_WritePin(GPIOA, GPIO_PIN_10, GPIO_PIN_SET);
-
-	//END TEST
-
-
-	//printf("wait \n");
-
+	init_usart2(57600,F_CPU);
+	char rxData[255] = {0};
+	int index = 0;
+	uint8_t data;
 	while (1) {
 
-//		uint8_t data;
-
-
-//			for(int i = 0; i < 255; i++){
-//				printf("%c", dataReceived[i]);
-//				if(dataReceived[i+1] == '0'){
-//					x = 300;
-//				}
-//			}
-
-
-		//HAL_StatusTypeDef rx;
-
-		//set tx and rx to GPIO in/out
-		//rx interrupt for clock edge - starts timer, calls function
-		//if statement for rx, if statement for tx
-
-		//idle at 1
-
-		/*if(HAL_UART_GetState(&huart2) == HAL_UART_STATE_BUSY_RX){
-		 while(rx == HAL_BUSY){*/
-		//HAL_UART_Receive(&huart2, &data, 1, HAL_MAX_DELAY);
-
-/*
-		if (data == 13 || data == 10) {
-//			for (int y = 0; y < x; y++) {
-//				//printf("%c", rxString[y]);
-//			}
-			sendData(rxString, x);
-			resetBuffer(rxString);
-			//printf("\n");
-			x = 0;
-			HAL_GPIO_WritePin(GPIOA, GPIO_PIN_10, GPIO_PIN_SET);
-		} else {
-			rxString[x] = data;
-			x++;
+		data = usart2_getch();
+//		printf("%d \n", data[index-1]);
+		if(((data >= 32) && (data <= 126)) || data == 13 || data == 10)
+		{
+//			printf("works");
+			if(data == 13 || data == 10)
+			{
+//				printf("works");
+				sendData(rxData, index);
+				data = 0;
+				index = 0;
+			}
+			else
+			{
+				rxData[index] = data;
+				index++;
+//				rxData[index] = '0';
+			}
 		}
-		//printf("%c - %d\n", rxString[x], x);
 
-		if (x > 255) {
-			x = 0;
-		}*/
-    /* USER CODE END WHILE */
 
-    /* USER CODE BEGIN 3 */
+//		uint8_t data;
+//
+//		for(int i = 0; i < 255; i++){
+//			printf("%c", dataReceived[i]);
+//			if(dataReceived[i+1] == '0'){
+//				x = 300;
+//			}
+//		}
+//
+//
+//		HAL_StatusTypeDef rx;
+//
+//		// set tx and rx to GPIO in/out
+//		// rx interrupt for clock edge - starts timer, calls function
+//		// if statement for rx, if statement for tx
+//
+//		// idle at 1
+//
+//		if(HAL_UART_GetState(&huart2) == HAL_UART_STATE_BUSY_RX){
+//		 while(rx == HAL_BUSY){
+//		HAL_UART_Receive(&huart2, &data, 1, HAL_MAX_DELAY);
+//
+//		if (data == 13 || data == 10) {
+//			for (int y = 0; y < x; y++) {
+//				printf("%c", rxString[y]);
+//			}
+//			sendData(rxString, x);
+//			resetBuffer(rxString);
+//			//printf("\n");
+//			x = 0;
+//			HAL_GPIO_WritePin(GPIOA, GPIO_PIN_10, GPIO_PIN_SET);
+//		} else {
+//			rxString[x] = data;
+//			x++;
+//		}
+//		//printf("%c - %d\n", rxString[x], x);
+//
+//		if (x > 255) {
+//			x = 0;
+//		}*/
 	}
-  /* USER CODE END 3 */
 }
 
 /**
@@ -254,30 +191,23 @@ void SystemClock_Config(void)
   }
 }
 
-/* USER CODE BEGIN 4 */
-/*
- * @brief starts timer on edge and reads rx pin
- */
+/**
+  * @brief starts timer on edge and reads rx pin
+  */
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
-	/* Prevent unused argument(s) compilation warning */
-	//reset/set timer, check if it is >480us
-	//skip next edge
+
 	enableTimer();
 
 	if (timerFlag)
 	{
 		timerFlag = false;
 
-//		if(getState() != COLLISION){
-			setState(BUSY);
-			monitorPin(BUSY);
-			rxRead();
-//		}
+		setState(BUSY);
+		monitorPin(BUSY);
+		rxRead();
 	}
 
 }
-
-/* USER CODE END 4 */
 
 /**
   * @brief  Period elapsed callback in non blocking mode
@@ -289,15 +219,9 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
   */
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 {
-  /* USER CODE BEGIN Callback 0 */
-
-  /* USER CODE END Callback 0 */
   if (htim->Instance == TIM1) {
     HAL_IncTick();
   }
-  /* USER CODE BEGIN Callback 1 */
-
-  /* USER CODE END Callback 1 */
 }
 
 /**
@@ -306,27 +230,8 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
   */
 void Error_Handler(void)
 {
-  /* USER CODE BEGIN Error_Handler_Debug */
 	/* User can add his own implementation to report the HAL error return state */
 	__disable_irq();
 	while (1) {
 	}
-  /* USER CODE END Error_Handler_Debug */
 }
-
-#ifdef  USE_FULL_ASSERT
-/**
-  * @brief  Reports the name of the source file and the source line number
-  *         where the assert_param error has occurred.
-  * @param  file: pointer to the source file name
-  * @param  line: assert_param error line source number
-  * @retval None
-  */
-void assert_failed(uint8_t *file, uint32_t line)
-{
-  /* USER CODE BEGIN 6 */
-  /* User can add his own implementation to report the file name and line number,
-     ex: printf("Wrong parameters value: file %s on line %d\r\n", file, line) */
-  /* USER CODE END 6 */
-}
-#endif /* USE_FULL_ASSERT */
