@@ -53,8 +53,8 @@ void initTimer(void)
 	tim5->DIER |= 0x1;
 	nvic->ISER1 |= (1<<18);
 
-	tim5->ARR  = 0x15000; // 0x14444;
-	tim5->CCR1 = 0x15000; // 0x14444;
+	tim5->ARR  = 0x2100; // 0x14444;
+	tim5->CCR1 = 0x2100; // 0x14444;
 	tim5->CCER |= CC1E;
 
 //    tim5->CR1 |= CEN;

@@ -67,7 +67,6 @@ void resetBuffer(char * buffer){
 void wait(){
 	int Nmax = 1000;
 	int N = rand() % (Nmax+1);
-
 	int t = (N/Nmax); //in ms
 	delay_ms(t);
 }
