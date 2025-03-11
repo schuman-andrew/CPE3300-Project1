@@ -1,9 +1,13 @@
-/*
- * uart_driver.c
- *
- *  Created on: Nov 8, 2016
- *      Author: barnekow
- */
+ /******************************************************************************
+  	* @file : uart_driver.c
+  	* @date : Feb 11, 2025
+	* @author : Matt Andersen & Andrew Schuman
+	* @course : CPE3300
+	* @section : 111
+	* @assignment : Project 1 Network Interface Node
+	* @brief :
+  ******************************************************************************/
+
 #include "uart_driver.h"
 #include <inttypes.h>
 #include <stdio.h>

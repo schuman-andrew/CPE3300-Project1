@@ -1,4 +1,4 @@
-/* USER CODE BEGIN Header */
+
 /**
  ******************************************************************************
  	* @file : main.c
@@ -9,19 +9,8 @@
 	* @assignment : Project 1 Network Interface Node
 	* @brief : initializes all peripherals and sends data
  ******************************************************************************
- * @attention
- *
- * Copyright (c) 2025 STMicroelectronics.
- * All rights reserved.
- *
- * This software is licensed under terms that can be found in the LICENSE file
- * in the root directory of this software component.
- * If no LICENSE file comes with this software, it is provided AS-IS.
- *
- ******************************************************************************
- */
 
-/* Includes ------------------------------------------------------------------*/
+/ Includes ------------------------------------------------------------------*/
 #include "main.h"
 #include "usart.h"
 #include "gpio.h"
@@ -32,7 +21,6 @@
 #include "timer.h"
 #include "stm32f411xe.h"
 #include "delay.h"
-#include "console.h"
 #include "uart_driver.h"
 
 /* Variables ------------------------------------------------------------------*/
@@ -57,6 +45,10 @@ int main(void)
 	HAL_GPIO_WritePin(GPIOA, GPIO_PIN_10, GPIO_PIN_SET);
 
 	init_usart2(57600,F_CPU);
+
+	char rxTest[2] = {'H', 'i'};
+	sendData(rxTest, 2);
+
 	char rxData[255] = {0};
 	int index = 0;
 	uint8_t data;

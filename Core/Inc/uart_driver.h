@@ -1,9 +1,8 @@
-/*
- * uart_driver.h
- *
- *  Created on: Nov 8, 2016
- *      Author: barnekow
- */
+  /******************************************************************************
+  * @file           : uart_driver.h
+  * @brief          : Header for main.c file.
+  *                   This file contains the common defines of the application.
+  ******************************************************************************/
 
 #ifndef UART_DRIVER_H_
 #define UART_DRIVER_H_
